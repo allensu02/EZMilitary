@@ -22,6 +22,8 @@ struct ContentView: View {
         "完全沒有地址的文字\n只有一些描述\n沒有台中市的地址"
     ]
     
+    @StateObject private var anthropicService = AnthropicService()
+    
     private func runAddressTests() {
         transcriptText = ""
         for (index, test) in testAddresses.enumerated() {
@@ -115,6 +117,42 @@ struct ContentView: View {
                                 RoundedRectangle(cornerRadius: 8)
                                     .stroke(Color(.systemGray3), lineWidth: 1)
                             )
+                        
+                        if let address = extractedAddress {
+                            Button("推測里別") {
+                                Task {
+                                    await anthropicService.inferVillage(from: address)
+                                }
+                            }
+                            .padding()
+                            
+                            if anthropicService.isLoading {
+                                ProgressView("推測中...")
+                                    .padding()
+                            } else if let village = anthropicService.inferredVillage {
+                                VStack {
+                                    Text("推測里別：")
+                                        .font(.headline)
+                                    Text(village)
+                                        .font(.title3)
+                                        .padding()
+                                        .frame(maxWidth: .infinity)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(Color(.systemGray6))
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color(.systemGray3), lineWidth: 1)
+                                        )
+                                }
+                                .padding(.horizontal)
+                            } else if let error = anthropicService.error {
+                                Text("錯誤：\(error.localizedDescription)")
+                                    .foregroundColor(.red)
+                                    .padding()
+                            }
+                        }
                     }
                     .padding(.horizontal)
                     
@@ -122,7 +160,6 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity, minHeight: 200)
                         .padding()
                 }
-                
                 
                 HStack {
                     Button("清除文字") {
