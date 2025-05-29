@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		BE28DABB2DE6DAD500AE98F6 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE28DABA2DE6DAD500AE98F6 /* Data.swift */; };
-		BE28DAC12DE802B200AE98F6 /* AnthropicService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE28DAC02DE802B200AE98F6 /* AnthropicService.swift */; };
 		BE28DAC42DE8038900AE98F6 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE28DAC32DE8038900AE98F6 /* Config.swift */; };
 		BE77F6432DE6A5550031EF30 /* EZMilitaryServiceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE77F6422DE6A5550031EF30 /* EZMilitaryServiceApp.swift */; };
 		BE77F6452DE6A5550031EF30 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE77F6442DE6A5550031EF30 /* ContentView.swift */; };
@@ -18,7 +17,6 @@
 
 /* Begin PBXFileReference section */
 		BE28DABA2DE6DAD500AE98F6 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
-		BE28DAC02DE802B200AE98F6 /* AnthropicService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicService.swift; sourceTree = "<group>"; };
 		BE28DAC32DE8038900AE98F6 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		BE77F63F2DE6A5550031EF30 /* EZMilitaryService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EZMilitaryService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE77F6422DE6A5550031EF30 /* EZMilitaryServiceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EZMilitaryServiceApp.swift; sourceTree = "<group>"; };
@@ -66,7 +64,6 @@
 			isa = PBXGroup;
 			children = (
 				BE28DAC22DE8038000AE98F6 /* Secrets */,
-				BE28DAC02DE802B200AE98F6 /* AnthropicService.swift */,
 				BE77F6422DE6A5550031EF30 /* EZMilitaryServiceApp.swift */,
 				BE28DABA2DE6DAD500AE98F6 /* Data.swift */,
 				BE77F6442DE6A5550031EF30 /* ContentView.swift */,
@@ -158,7 +155,6 @@
 				BE28DABB2DE6DAD500AE98F6 /* Data.swift in Sources */,
 				BE77F6432DE6A5550031EF30 /* EZMilitaryServiceApp.swift in Sources */,
 				BE28DAC42DE8038900AE98F6 /* Config.swift in Sources */,
-				BE28DAC12DE802B200AE98F6 /* AnthropicService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
