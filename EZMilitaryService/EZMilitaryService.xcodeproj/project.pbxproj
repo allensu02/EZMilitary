@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		BE28DABB2DE6DAD500AE98F6 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE28DABA2DE6DAD500AE98F6 /* Data.swift */; };
 		BE28DAC42DE8038900AE98F6 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE28DAC32DE8038900AE98F6 /* Config.swift */; };
+		BE5CA7E72DE83F9900B97424 /* GoogleGeocoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE5CA7E62DE83F9900B97424 /* GoogleGeocoding.swift */; };
 		BE77F6432DE6A5550031EF30 /* EZMilitaryServiceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE77F6422DE6A5550031EF30 /* EZMilitaryServiceApp.swift */; };
 		BE77F6452DE6A5550031EF30 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE77F6442DE6A5550031EF30 /* ContentView.swift */; };
 		BE77F6472DE6A5560031EF30 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE77F6462DE6A5560031EF30 /* Assets.xcassets */; };
@@ -18,6 +19,7 @@
 /* Begin PBXFileReference section */
 		BE28DABA2DE6DAD500AE98F6 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
 		BE28DAC32DE8038900AE98F6 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		BE5CA7E62DE83F9900B97424 /* GoogleGeocoding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleGeocoding.swift; sourceTree = "<group>"; };
 		BE77F63F2DE6A5550031EF30 /* EZMilitaryService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EZMilitaryService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE77F6422DE6A5550031EF30 /* EZMilitaryServiceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EZMilitaryServiceApp.swift; sourceTree = "<group>"; };
 		BE77F6442DE6A5550031EF30 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 				BE28DAC22DE8038000AE98F6 /* Secrets */,
 				BE77F6422DE6A5550031EF30 /* EZMilitaryServiceApp.swift */,
 				BE28DABA2DE6DAD500AE98F6 /* Data.swift */,
+				BE5CA7E62DE83F9900B97424 /* GoogleGeocoding.swift */,
 				BE77F6442DE6A5550031EF30 /* ContentView.swift */,
 				BE77F6462DE6A5560031EF30 /* Assets.xcassets */,
 				BE77F6482DE6A5560031EF30 /* Preview Content */,
@@ -151,6 +154,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE5CA7E72DE83F9900B97424 /* GoogleGeocoding.swift in Sources */,
 				BE77F6452DE6A5550031EF30 /* ContentView.swift in Sources */,
 				BE28DABB2DE6DAD500AE98F6 /* Data.swift in Sources */,
 				BE77F6432DE6A5550031EF30 /* EZMilitaryServiceApp.swift in Sources */,

@@ -7,6 +7,9 @@ struct ContentView: View {
     @State private var scannerController: DataScannerViewController?
     @State private var scanMode: ScanMode = .village
     @State private var transcriptText = ""
+    @State private var villageName: String?
+    @State private var isLoadingVillage = false
+    private let geocoding = GoogleGeocoding()
     
     enum ScanMode {
         case village
@@ -49,6 +52,26 @@ struct ContentView: View {
     
     private var extractedAddress: String? {
         return extractAddress(from: transcriptText)
+    }
+    
+    private func lookupVillage(for address: String) {
+        isLoadingVillage = true
+        villageName = nil
+        
+        Task {
+            do {
+                let village = try await geocoding.getVillageName(from: address)
+                await MainActor.run {
+                    villageName = village
+                    isLoadingVillage = false
+                }
+            } catch {
+                await MainActor.run {
+                    villageName = "查詢失敗：\(error.localizedDescription)"
+                    isLoadingVillage = false
+                }
+            }
+        }
     }
     
     var body: some View {
@@ -103,24 +126,74 @@ struct ContentView: View {
                             .font(.headline)
                             .padding(.top)
                         
-                        Text(extractedAddress ?? "")
-                            .font(.title2)
+                        if let address = extractedAddress {
+                            Text(address)
+                                .font(.title2)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color(.systemGray6))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color(.systemGray3), lineWidth: 1)
+                                )
+                            
+                            if isLoadingVillage {
+                                ProgressView("查詢里別中...")
+                                    .padding()
+                            } else {
+                                Button("查詢里別") {
+                                    lookupVillage(for: address)
+                                }
+                                .padding()
+                            }
+                            
+                            if let villageName = villageName {
+                                VStack {
+                                    Text("里別：")
+                                        .font(.headline)
+                                    Text(villageName)
+                                        .font(.title3)
+                                        .padding()
+                                        .frame(maxWidth: .infinity)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(Color(.systemGray6))
+                                        )
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(Color(.systemGray3), lineWidth: 1)
+                                        )
+                                    
+                                    if let team = teamMappings.first(where: { $0.value.contains(villageName) })?.key {
+                                        Text("所屬分隊：")
+                                            .font(.headline)
+                                            .padding(.top)
+                                        Text(team)
+                                            .font(.title3)
+                                            .padding()
+                                            .frame(maxWidth: .infinity)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .fill(Color(.systemGray6))
+                                            )
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(Color(.systemGray3), lineWidth: 1)
+                                            )
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                        
+                        TextEditor(text: $transcriptText)
+                            .frame(maxWidth: .infinity, minHeight: 200)
                             .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(.systemGray6))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color(.systemGray3), lineWidth: 1)
-                            )
                     }
                     .padding(.horizontal)
-                    
-                    TextEditor(text: $transcriptText)
-                        .frame(maxWidth: .infinity, minHeight: 200)
-                        .padding()
                 }
                 
                 HStack {
