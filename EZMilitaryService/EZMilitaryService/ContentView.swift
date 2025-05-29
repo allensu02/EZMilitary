@@ -7,13 +7,12 @@ struct ContentView: View {
     @State private var scannerController: DataScannerViewController?
     @State private var scanMode: ScanMode = .village
     @State private var transcriptText = ""
-    @State private var extractedAddress: String?
-
+    
     enum ScanMode {
         case village
         case transcript
     }
-
+    
     private let testAddresses = [
         "收件地址：台中市北屯區松竹路二段123號",
         "病患資料\n姓名：王小明\n地址：臺中市西屯區文心路300號3樓之2\n電話：04-12345678",
@@ -22,33 +21,36 @@ struct ContentView: View {
         "雜亂的文字在這裡\n台中市西區美村路一段13號4樓\n更多雜亂的文字",
         "完全沒有地址的文字\n只有一些描述\n沒有台中市的地址"
     ]
-
+    
     private func runAddressTests() {
         transcriptText = ""
         for (index, test) in testAddresses.enumerated() {
             transcriptText += "測試 #\(index + 1):\n"
             transcriptText += "輸入文字：\n\(test)\n"
-            if let extracted = extractAddress(from: test) {
-                transcriptText += "✅ 找到地址：\(extracted)\n"
-            } else {
-                transcriptText += "❌ 未找到地址\n"
-            }
-            transcriptText += "\n"
         }
-        extractedAddress = extractAddress(from: transcriptText)
     }
-
+    
     private func extractAddress(from text: String) -> String? {
-        // For demonstration purposes, this will just return the first line that contains "台中市"
         let lines = text.components(separatedBy: "\n")
         for line in lines {
             if line.contains("台中市") || line.contains("臺中市") {
-                return line
+                // Clean up the line to extract just the address
+                if let range = line.range(of: "(?:台中市|臺中市).*?(?:路|街|道).*?(?:\\d+巷)?.*?(?:\\d+號|樓)?", options: .regularExpression) {
+                    return String(line[range])
+                }
+                // Fallback if regex doesn't match
+                if let range = line.range(of: "(?:台中市|臺中市).*?(?:路|街|道).*", options: .regularExpression) {
+                    return String(line[range])
+                }
             }
         }
         return nil
     }
-
+    
+    private var extractedAddress: String? {
+        return extractAddress(from: transcriptText)
+    }
+    
     var body: some View {
         VStack {
             Picker("掃描模式", selection: $scanMode) {
@@ -57,7 +59,7 @@ struct ContentView: View {
             }
             .pickerStyle(.segmented)
             .padding()
-
+            
             if scanning {
                 DataScannerView(
                     recognizedItems: .constant([]),
@@ -82,7 +84,7 @@ struct ContentView: View {
                 )
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-
+            
             if scanMode == .village {
                 if let result = scanResult {
                     Text(result)
@@ -96,39 +98,35 @@ struct ContentView: View {
                 }
             } else {
                 ScrollView {
+                    VStack {
+                        Text("偵測到地址：")
+                            .font(.headline)
+                            .padding(.top)
+                        
+                        Text(extractedAddress ?? "")
+                            .font(.title2)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(.systemGray6))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .stroke(Color(.systemGray3), lineWidth: 1)
+                            )
+                    }
+                    .padding(.horizontal)
                     
                     TextEditor(text: $transcriptText)
                         .frame(maxWidth: .infinity, minHeight: 200)
                         .padding()
-                    
-                    if let address = extractedAddress {
-                        
-                        VStack {
-                            Text("偵測到地址：")
-                                .font(.headline)
-                                .padding(.top)
-                            
-                            Text(address)
-                                .font(.title2)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .fill(Color(.systemGray6))
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color(.systemGray3), lineWidth: 1)
-                                )
-                        }
-                        .padding(.horizontal)
-                    }
                 }
-
+                
+                
                 HStack {
                     Button("清除文字") {
                         transcriptText = ""
-                        extractedAddress = nil
                     }
                     
                     Button("執行測試") {
@@ -137,7 +135,7 @@ struct ContentView: View {
                 }
                 .padding()
             }
-
+            
             if scanResult == nil || scanMode == .transcript {
                 Button(scanning ? "停止掃描" : "開始掃描") {
                     scanning.toggle()
@@ -156,7 +154,7 @@ struct DataScannerView: UIViewControllerRepresentable {
     let recognizedDataType: DataScannerViewController.RecognizedDataType
     let recognizedText: (String) -> Void
     @Binding var scannerController: DataScannerViewController?
-
+    
     func makeUIViewController(context: Context) -> DataScannerViewController {
         let vc = DataScannerViewController(
             recognizedDataTypes: [recognizedDataType],
@@ -167,22 +165,22 @@ struct DataScannerView: UIViewControllerRepresentable {
         scannerController = vc
         return vc
     }
-
+    
     func updateUIViewController(_ uiViewController: DataScannerViewController, context: Context) {
         try? uiViewController.startScanning()
     }
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(recognizedText: recognizedText)
     }
-
+    
     class Coordinator: NSObject, DataScannerViewControllerDelegate {
         let recognizedText: (String) -> Void
-
+        
         init(recognizedText: @escaping (String) -> Void) {
             self.recognizedText = recognizedText
         }
-
+        
         func dataScanner(_ dataScanner: DataScannerViewController, didAdd items: [RecognizedItem], allItems: [RecognizedItem]) {
             for case let .text(text) in items {
                 recognizedText(text.transcript)
