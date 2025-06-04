@@ -38,7 +38,7 @@ struct ContentView: View {
         let lines = text.components(separatedBy: "\n")
         for line in lines {
             // Find city name first
-            guard let cityStart = line.range(of: "台中市")?.lowerBound ?? line.range(of: "臺中市")?.lowerBound else {
+            guard let cityStart = line.range(of: "台中")?.lowerBound ?? line.range(of: "臺中")?.lowerBound else {
                 continue
             }
             
@@ -85,6 +85,17 @@ struct ContentView: View {
         isLoadingVillage = true
         villageName = nil
         
+        if let liRange = address.range(of: "里") {
+            let beforeLi = address[..<liRange.lowerBound]
+            if let lastWordRange = beforeLi.range(of: "[一-龥]{2}$", options: [.regularExpression, .backwards]) {
+                let villageLiName = String(address[lastWordRange.lowerBound..<liRange.upperBound])
+                villageName = villageLiName
+                isLoadingVillage = false
+                return
+            }
+        }
+        
+        // If no 里 found, use Google Geocoding API
         Task {
             do {
                 let village = try await geocoding.getVillageName(from: address)
