@@ -37,8 +37,7 @@ struct ContentView: View {
         let lines = text.components(separatedBy: "\n")
         for line in lines {
             if line.contains("台中市") || line.contains("臺中市") {
-                // Clean up the line to extract just the address
-                if let range = line.range(of: "(?:台中市|臺中市).*?(?:路|街|道).*?(?:\\d+巷)?.*?(?:\\d+號|樓)?", options: .regularExpression) {
+                if let range = line.range(of: "(?:台中市|臺中市)[^\\n]*?(?:路|街|道)(?:[一二三四五六七八九十\\d]+段)?[^\\n]*?(?:[一二三四五六七八九十\\d]+巷)?[^\\n]*?(?:\\d+號)?(?:[一二三四五六七八九十\\d]+之[一二三四五六七八九十\\d]+)?(?:樓)?", options: .regularExpression) {
                     return String(line[range])
                 }
                 // Fallback if regex doesn't match
@@ -183,6 +182,11 @@ struct ContentView: View {
                                                 RoundedRectangle(cornerRadius: 8)
                                                     .stroke(Color(.systemGray3), lineWidth: 1)
                                             )
+                                    } else {
+                                        Text("此里未納入服務範圍")
+                                            .foregroundColor(.red)
+                                            .font(.headline)
+                                            .padding(.top)
                                     }
                                 }
                                 .padding(.horizontal)
