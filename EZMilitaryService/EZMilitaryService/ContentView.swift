@@ -9,6 +9,7 @@ struct ContentView: View {
     @State private var transcriptText = ""
     @State private var villageName: String?
     @State private var isLoadingVillage = false
+    @State private var useSimpleParsing = true
     private let geocoding = GoogleGeocoding()
     
     enum ScanMode {
@@ -33,15 +34,42 @@ struct ContentView: View {
         }
     }
     
-    private func extractAddress(from text: String) -> String? {
+    private func extractAddressSimple(from text: String) -> String? {
+        let lines = text.components(separatedBy: "\n")
+        for line in lines {
+            // Find city name first
+            guard let cityStart = line.range(of: "台中市")?.lowerBound ?? line.range(of: "臺中市")?.lowerBound else {
+                continue
+            }
+            
+            // Find 號 after the city name
+            let afterCity = line[cityStart...]
+            guard let numEnd = afterCity.range(of: "號")?.upperBound else {
+                continue
+            }
+            
+            // Get the base address
+            var address = String(line[cityStart..<numEnd])
+            
+            // Check for floor number
+            let afterNum = line[numEnd...]
+            if let floorRange = afterNum.range(of: "\\d+樓", options: .regularExpression) {
+                address += String(afterNum[..<floorRange.upperBound])
+            }
+            
+            return address
+        }
+        return nil
+    }
+    
+    private func extractAddressRegex(from text: String) -> String? {
         let lines = text.components(separatedBy: "\n")
         for line in lines {
             if line.contains("台中市") || line.contains("臺中市") {
-                if let range = line.range(of: "(?:台中市|臺中市)[^\\n]*?(?:路|街|道)(?:[一二三四五六七八九十\\d]+段)?[^\\n]*?(?:[一二三四五六七八九十\\d]+巷)?[^\\n]*?(?:\\d+號)?(?:[一二三四五六七八九十\\d]+之[一二三四五六七八九十\\d]+)?(?:樓)?", options: .regularExpression) {
+                if let range = line.range(of: "(?:台中市|臺中市)[^\\n]*?(?:路|街|道|巷)(?:[^\\n]*?(?:\\d+(?:-\\d+)?號)?(?:\\d+樓)?)", options: .regularExpression) {
                     return String(line[range])
                 }
-                // Fallback if regex doesn't match
-                if let range = line.range(of: "(?:台中市|臺中市).*?(?:路|街|道).*", options: .regularExpression) {
+                if let range = line.range(of: "(?:台中市|臺中市).*?(?:路|街|道|巷).*", options: .regularExpression) {
                     return String(line[range])
                 }
             }
@@ -50,7 +78,7 @@ struct ContentView: View {
     }
     
     private var extractedAddress: String? {
-        return extractAddress(from: transcriptText)
+        return useSimpleParsing ? extractAddressSimple(from: transcriptText) : extractAddressRegex(from: transcriptText)
     }
     
     private func lookupVillage(for address: String) {
@@ -191,6 +219,11 @@ struct ContentView: View {
                                 }
                                 .padding(.horizontal)
                             }
+                        } else {
+                            Text("無法偵測到地址")
+                                .foregroundColor(.red)
+                                .font(.title2)
+                                .padding()
                         }
                         
                         TextEditor(text: $transcriptText)
@@ -210,6 +243,11 @@ struct ContentView: View {
                     }
                 }
                 .padding()
+            }
+            
+            if scanMode == .transcript {
+                Toggle("使用簡易地址解析", isOn: $useSimpleParsing)
+                    .padding(.horizontal)
             }
             
             if scanResult == nil || scanMode == .transcript {
